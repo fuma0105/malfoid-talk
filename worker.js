@@ -103,7 +103,22 @@ export default {
     } catch {
       return json({ error: "AI service is temporarily unavailable." }, 502, origin);
     }
-    if (!upstream.ok) return json({ error: "AI service returned an error. Try again later." }, 502, origin);
+    if (!upstream.ok) {
+  let detail = {};
+  try {
+    const data = await upstream.json();
+    detail = data?.error || {};
+  } catch {}
+
+  console.error("OpenAI API error", JSON.stringify({
+    status: upstream.status,
+    type: detail.type,
+    code: detail.code,
+    message: detail.message,
+  }));
+
+  return json({ error: "AI service returned an error. Try again later." }, 502, origin);
+}
     let response;
     try { response = await upstream.json(); } catch { return json({ error: "Invalid AI response." }, 502, origin); }
     const text = response.output?.flatMap(item => item.content || []).find(part => part.type === "output_text")?.text;
