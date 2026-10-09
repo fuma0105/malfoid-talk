@@ -10,3 +10,10 @@ namespace_id = "18422010"
 [ratelimits.simple]
 limit = 10
 period = 60
+[observability]
+enabled = true
+
+[observability.logs]
+enabled = true
+invocation_logs = true
+persist = true
